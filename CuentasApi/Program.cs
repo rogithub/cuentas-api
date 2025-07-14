@@ -5,6 +5,25 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var originsToAllowName = "myCors";
+// cors
+var myCorsOrigins = builder.Configuration
+                    .GetSection("CorsSettings:AllowedOrigins")
+                    .Get<string[]>() ?? Array.Empty<string>();
+
+builder.Services.AddCors(
+                    options =>
+                    {
+                        options.AddPolicy(name: originsToAllowName, policy =>
+                        {
+                            policy.WithOrigins(myCorsOrigins)
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                        });
+                    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -15,6 +34,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(originsToAllowName);
+app.UseAuthorization();
 
 app.MapControllers();
 
