@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using CuentasApi.Models;
+using CuentasApi.Data;
 
 namespace CuentasApi.Controllers;
 
@@ -7,13 +8,7 @@ namespace CuentasApi.Controllers;
 [Route("api/[controller]")]
 public class TransactionsController : ControllerBase
 {
-    private static List<Transaction> _transactions = new List<Transaction>
-    {
-        new Transaction { Id = 1, AccountId = 1, Amount = 100.00m, Description = "Salario", Type = TransactionType.Income, TransactionDate = DateTime.UtcNow.AddDays(-10) },
-        new Transaction { Id = 2, AccountId = 1, Amount = 25.50m, Description = "Supermercado", Type = TransactionType.Expense, TransactionDate = DateTime.UtcNow.AddDays(-8) },
-        new Transaction { Id = 3, AccountId = 2, Amount = 50.00m, Description = "Pago de tarjeta", Type = TransactionType.Expense, TransactionDate = DateTime.UtcNow.AddDays(-5) },
-        new Transaction { Id = 4, AccountId = 3, Amount = 1200.00m, Description = "Venta de acciones", Type = TransactionType.Income, TransactionDate = DateTime.UtcNow.AddDays(-2) }
-    };
+    private static List<Transaction> _transactions = InMemoryDb.Transactions;
 
     // GET: api/transactions
     [HttpGet]

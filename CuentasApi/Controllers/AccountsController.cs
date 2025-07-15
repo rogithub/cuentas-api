@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using CuentasApi.Models;
+using CuentasApi.Data;
 
 namespace CuentasApi.Controllers;
 
@@ -9,12 +10,19 @@ public class AccountsController : ControllerBase
 {
     // --- NUESTRA BASE DE DATOS EN MEMORIA (MOCK) ---
     // Usamos 'static' para que la lista persista entre diferentes peticiones HTTP.
-    private static List<Account> _accounts = new List<Account>
+    private static List<Account> _accounts = InMemoryDb.Accounts;
+
+    [HttpGet("{accountId}/transactions")]
+    public ActionResult<IEnumerable<Transaction>> GetTransactionsFrorAccount(long accountId)
     {
-        new Account { Id = 1, Name = "Cuenta de Ahorros", Balance = 1500.75m, CreatedAt = DateTime.UtcNow },
-        new Account { Id = 2, Name = "Tarjeta de Crédito", Balance = -450.50m, CreatedAt = DateTime.UtcNow.AddDays(-30) },
-        new Account { Id = 3, Name = "Inversiones", Balance = 12500.00m, CreatedAt = DateTime.UtcNow.AddDays(-90) }
-    };
+        var account = InMemoryDb.Accounts.FirstOrDefault(a => a.Id == accountId);
+        if (account == null)
+        {
+            return NotFound($"No se encontró la cuenta con ID {accountId}");
+        }
+        var transactions = InMemoryDb.Transactions.Where(t => t.AccountId == accountId).ToList();
+        return Ok(transactions);
+    }
 
     // GET: api/accounts
     [HttpGet]
